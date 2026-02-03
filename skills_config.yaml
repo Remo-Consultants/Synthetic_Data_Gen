@@ -1,0 +1,488 @@
+# ============================================================
+# skills_config.yaml — Skill & Benchmark Registry
+# ============================================================
+# v3 — Ollama backend (primary), GGUF/HF fallbacks
+# ============================================================
+
+skills:
+
+  # ── Foundation layer ──────────────────────────────────────
+  - id: FND-LEX-HI
+    name: "Hindi Lexical & Syntactic"
+    category: Foundation
+    stages: [PRE]
+    band: [B0, B2]
+    benchmarks: [HellaSwag-Hi]
+    seed_source: hindi_wikipedia
+    languages: [hi, en]
+    cot_style: linguistic_parse
+
+  - id: FND-SEM
+    name: "Semantic Understanding"
+    category: Foundation
+    stages: [PRE]
+    band: [B1, B3]
+    benchmarks: [WinoGrande, COPA]
+    seed_source: wikipedia_vital
+    languages: [en]
+    cot_style: semantic_chain
+
+  - id: FND-MORPH
+    name: "Morphological Analysis"
+    category: Foundation
+    stages: [PRE]
+    band: [B0, B2]
+    benchmarks: [MorphoChallenge]
+    seed_source: wiktionary
+    languages: [hi, en, de]
+    cot_style: linguistic_parse
+
+  # ── Reasoning layer ───────────────────────────────────────
+  - id: RSN-ARITH
+    name: "Arithmetic & Numerical"
+    category: Reasoning
+    stages: [PRE, SFT]
+    band: [B2, B4]
+    benchmarks: [GSM8K]
+    seed_source: math_problems
+    languages: [en, hi]
+    cot_style: step_by_step_math
+
+  - id: RSN-LOGIC
+    name: "Logical Deduction"
+    category: Reasoning
+    stages: [SFT]
+    band: [B2, B4]
+    benchmarks: [LogiQA, ReClor]
+    seed_source: logic_puzzles
+    languages: [en]
+    cot_style: deductive_chain
+
+  - id: RSN-CAUSAL
+    name: "Causal Reasoning"
+    category: Reasoning
+    stages: [PRE, SFT]
+    band: [B2, B5]
+    benchmarks: [COPA, e-CARE]
+    seed_source: wikipedia_vital
+    languages: [en, hi]
+    cot_style: causal_graph
+
+  - id: RSN-ANALOGICAL
+    name: "Analogical Reasoning"
+    category: Reasoning
+    stages: [SFT]
+    band: [B3, B5]
+    benchmarks: [BATS, SAT-Analogy]
+    seed_source: concept_pairs
+    languages: [en]
+    cot_style: mapping_chain
+
+  # ── Generation layer ──────────────────────────────────────
+  - id: GEN-SUMM
+    name: "Abstractive Summarization"
+    category: Generation
+    stages: [SFT]
+    band: [B2, B4]
+    benchmarks: [XSum, CNN-DM]
+    seed_source: news_articles
+    languages: [en, hi]
+    cot_style: compression_trace
+
+  - id: GEN-PARA
+    name: "Paraphrase Generation"
+    category: Generation
+    stages: [SFT]
+    band: [B1, B3]
+    benchmarks: [PAWS, QQP]
+    seed_source: wikipedia_vital
+    languages: [en, hi]
+    cot_style: rewrite_trace
+
+  - id: GEN-CREATIVE
+    name: "Creative Writing"
+    category: Generation
+    stages: [SFT, DPO]
+    band: [B3, B5]
+    benchmarks: [WritingPrompts]
+    seed_source: story_seeds
+    languages: [en]
+    cot_style: narrative_plan
+
+  # ── Applied layer ─────────────────────────────────────────
+  - id: APP-RAG
+    name: "RAG & Grounded QA"
+    category: Applied
+    stages: [SFT]
+    band: [B2, B4]
+    benchmarks: [HotpotQA, NQ]
+    seed_source: wikipedia_vital
+    languages: [en, hi]
+    cot_style: retrieval_reason
+
+  - id: APP-CLASS
+    name: "Text Classification"
+    category: Applied
+    stages: [SFT]
+    band: [B1, B3]
+    benchmarks: [MASSIVE, IndicNLU]
+    seed_source: labeled_text
+    languages: [en, hi]
+    cot_style: label_reason
+
+  - id: APP-NER
+    name: "Named Entity Recognition"
+    category: Applied
+    stages: [SFT]
+    band: [B1, B3]
+    benchmarks: [WikiANN, NERLDC]
+    seed_source: wikipedia_vital
+    languages: [en, hi]
+    cot_style: span_trace
+
+  - id: APP-TRANSLATE
+    name: "Translation & Code-Switch"
+    category: Applied
+    stages: [SFT]
+    band: [B2, B4]
+    benchmarks: [FLORES, IN22]
+    seed_source: parallel_corpus
+    languages: [en, hi]
+    cot_style: alignment_trace
+
+
+# ================================================================
+# CONTEXT LENGTH DISTRIBUTION PROFILES
+# ================================================================
+
+ctx_profiles:
+
+  1b:
+    1024: 0.70
+    2048: 0.20
+    4096: 0.10
+
+  3b:
+    1024: 0.50
+    2048: 0.30
+    4096: 0.20
+
+  8b:
+    1024: 0.20
+    2048: 0.20
+    4096: 0.40
+    8192: 0.20
+
+  14b:
+    1024: 0.10
+    2048: 0.20
+    4096: 0.40
+    8192: 0.30
+
+  32b:
+    2048: 0.15
+    4096: 0.30
+    8192: 0.35
+    16384: 0.20
+
+  70b:
+    2048: 0.10
+    4096: 0.25
+    8192: 0.30
+    16384: 0.25
+    32768: 0.10
+
+
+# ================================================================
+# MODEL POOL
+# ================================================================
+#
+# backend: ollama  ← HTTP API to local Ollama server (RECOMMENDED)
+# backend: gguf    ← llama-cpp-python (if installed)
+# backend: hf      ← HuggingFace transformers (slowest)
+#
+# For Ollama models, "ollama_model" is the exact name you'd use
+# with `ollama pull <name>`. The pipeline auto-pulls if missing.
+#
+# Pull commands for your RTX 3070 Laptop (run these first):
+#   ollama pull qwen3:8b
+#   ollama pull qwen2.5:7b
+#   ollama pull deepseek-r1:8b
+#   ollama pull deepseek-r1:1.5b
+#   ollama pull phi4-mini
+#   ollama pull llama3.1:8b
+#   ollama pull gemma2:9b
+#   ollama pull qwen3:4b
+#   ollama pull qwen3:1.7b
+#   ollama pull gemma2:2b
+
+models:
+
+  # ── Tier 1: 8 GB VRAM (RTX 3070 Laptop / 3060 / 4060) ──
+
+  - id: qwen3-8b
+    backend: ollama
+    ollama_model: "qwen3:8b"
+    size_class: 8b
+    ctx: 32768
+    max_cot: 8192
+    vram_est: 5.5
+    gpu_tier: consumer_8gb
+    strength: "Best all-rounder. Native thinking mode."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  - id: qwen2.5-7b
+    backend: ollama
+    ollama_model: "qwen2.5:7b"
+    size_class: 8b
+    ctx: 32768
+    max_cot: 4096
+    vram_est: 5.0
+    gpu_tier: consumer_8gb
+    strength: "Strong Hindi/multilingual."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  - id: deepseek-r1-8b
+    backend: ollama
+    ollama_model: "deepseek-r1:8b"
+    size_class: 8b
+    ctx: 32768
+    max_cot: 8192
+    vram_est: 5.0
+    gpu_tier: consumer_8gb
+    strength: "Native <think> COT. Best math/logic."
+    license: Apache-2.0
+    roles: [generator]
+
+  - id: phi4-mini
+    backend: ollama
+    ollama_model: "phi4-mini"
+    size_class: 3b
+    ctx: 131072
+    max_cot: 4096
+    vram_est: 2.8
+    gpu_tier: consumer_8gb
+    strength: "3.8B. Great reasoning/param."
+    license: MIT
+    roles: [generator]
+
+  - id: llama3.1-8b
+    backend: ollama
+    ollama_model: "llama3.1:8b"
+    size_class: 8b
+    ctx: 131072
+    max_cot: 4096
+    vram_est: 5.5
+    gpu_tier: consumer_8gb
+    strength: "Clean formatting."
+    license: Llama-3.1
+    roles: [generator, verifier]
+
+  - id: gemma2-9b
+    backend: ollama
+    ollama_model: "gemma2:9b"
+    size_class: 8b
+    ctx: 8192
+    max_cot: 2048
+    vram_est: 5.5
+    gpu_tier: consumer_8gb
+    strength: "Creative text."
+    license: Gemma
+    roles: [generator]
+
+  - id: qwen3-4b
+    backend: ollama
+    ollama_model: "qwen3:4b"
+    size_class: 3b
+    ctx: 32768
+    max_cot: 4096
+    vram_est: 3.0
+    gpu_tier: consumer_8gb
+    strength: "Rivals 72B at 4B."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  - id: qwen3-1.7b
+    backend: ollama
+    ollama_model: "qwen3:1.7b"
+    size_class: 1b
+    ctx: 32768
+    max_cot: 2048
+    vram_est: 1.5
+    gpu_tier: consumer_8gb
+    strength: "Tiny, fast."
+    license: Apache-2.0
+    roles: [seed_scorer, generator]
+
+  - id: deepseek-r1-1.5b
+    backend: ollama
+    ollama_model: "deepseek-r1:1.5b"
+    size_class: 1b
+    ctx: 32768
+    max_cot: 4096
+    vram_est: 1.5
+    gpu_tier: consumer_8gb
+    strength: "Ultra-light reasoner."
+    license: Apache-2.0
+    roles: [seed_scorer, generator]
+
+  - id: gemma2-2b
+    backend: ollama
+    ollama_model: "gemma2:2b"
+    size_class: 1b
+    ctx: 8192
+    max_cot: 1536
+    vram_est: 2.0
+    gpu_tier: consumer_8gb
+    strength: "Fast scorer."
+    license: Gemma
+    roles: [seed_scorer, generator]
+
+  # ── HF fallbacks (if Ollama not installed) ────────────────
+
+  - id: deepseek-r1-qwen-7b-hf
+    backend: hf
+    hf_repo: "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+    quant: 4bit
+    size_class: 8b
+    ctx: 32768
+    max_cot: 8192
+    vram_est: 5.0
+    gpu_tier: consumer_8gb
+    strength: "HF fallback."
+    license: Apache-2.0
+    roles: [generator]
+
+  - id: qwen3-8b-hf
+    backend: hf
+    hf_repo: "Qwen/Qwen3-8B"
+    quant: 4bit
+    size_class: 8b
+    ctx: 32768
+    max_cot: 4096
+    vram_est: 5.5
+    gpu_tier: consumer_8gb
+    strength: "HF fallback."
+    license: Apache-2.0
+    roles: [generator]
+
+  # ── Tier 2: 16 GB (RTX 4070 Ti, 3090) ────────────────────
+
+  - id: qwen3-14b
+    backend: ollama
+    ollama_model: "qwen3:14b"
+    size_class: 14b
+    ctx: 32768
+    max_cot: 8192
+    vram_est: 10.0
+    gpu_tier: mid_16gb
+    strength: "Matches Qwen2.5-32B."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  - id: deepseek-r1-14b
+    backend: ollama
+    ollama_model: "deepseek-r1:14b"
+    size_class: 14b
+    ctx: 32768
+    max_cot: 16384
+    vram_est: 10.0
+    gpu_tier: mid_16gb
+    strength: "Strongest R1 distill at 16GB."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  - id: mistral-small
+    backend: ollama
+    ollama_model: "mistral-small"
+    size_class: 14b
+    ctx: 32768
+    max_cot: 8192
+    vram_est: 14.0
+    gpu_tier: mid_16gb
+    strength: "Rivals Llama 70B."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  # ── Tier 3: 24 GB (RTX 4090, A5000) ──────────────────────
+
+  - id: qwen3-32b
+    backend: ollama
+    ollama_model: "qwen3:32b"
+    size_class: 32b
+    ctx: 32768
+    max_cot: 16384
+    vram_est: 20.0
+    gpu_tier: high_24gb
+    strength: "Top dense model."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  - id: deepseek-r1-32b
+    backend: ollama
+    ollama_model: "deepseek-r1:32b"
+    size_class: 32b
+    ctx: 32768
+    max_cot: 32768
+    vram_est: 20.0
+    gpu_tier: high_24gb
+    strength: "Beats o1-mini."
+    license: Apache-2.0
+    roles: [generator, verifier]
+
+  # ── Tier 4: Datacenter (A100, H100) ───────────────────────
+
+  - id: deepseek-r1-70b
+    backend: ollama
+    ollama_model: "deepseek-r1:70b"
+    size_class: 70b
+    ctx: 32768
+    max_cot: 32768
+    vram_est: 42.0
+    gpu_tier: datacenter_80gb
+    strength: "Best open-weight reasoning."
+    license: Llama-3.3
+    roles: [generator, verifier]
+
+  - id: qwen2.5-72b
+    backend: ollama
+    ollama_model: "qwen2.5:72b"
+    size_class: 70b
+    ctx: 32768
+    max_cot: 16384
+    vram_est: 42.0
+    gpu_tier: datacenter_80gb
+    strength: "Research-heavy COT."
+    license: Qwen
+    roles: [generator, verifier]
+
+
+# ================================================================
+# GENERATION SETTINGS
+# ================================================================
+
+generation:
+  model_strategy: random
+  gpu_tier: consumer_8gb
+  backend_filter: ollama     # ollama | gguf | hf | all
+
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 50
+  repetition_penalty: 1.1
+
+  # Context distribution mode:
+  #   profile  → sample from ctx_profiles per model size_class
+  #   fixed    → always use fallback_max_new_tokens
+  #   long_cot → always use model's max_cot
+  ctx_mode: profile
+
+  fallback_max_new_tokens: 2048
+  batch_size: 1
+  samples_per_seed: 3
+  max_retries: 2
+  checkpoint_every: 50
+  output_format: parquet
+  output_dir: ./output

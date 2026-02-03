@@ -1,0 +1,32 @@
+# ============================================================
+# COT Synthetic Dataset Generator — Dependencies
+# ============================================================
+#
+# PRIMARY: Ollama backend (no Python package needed!)
+#   1. Install Ollama: https://ollama.com
+#   2. Pull models: ollama pull qwen3:8b
+#   3. pip install -r requirements.txt
+#   4. python run_pipeline.py
+#
+# FALLBACK: HF transformers (slower, if Ollama unavailable)
+#   Uncomment the torch/transformers lines below.
+
+# ── Core (always needed) ────────────────────────────────────
+pyyaml>=6.0
+jinja2>=3.1
+pandas>=2.0
+pyarrow>=14.0
+
+# ── Ollama backend ──────────────────────────────────────────
+# No Python package needed! Ollama is called via HTTP.
+# Just install the Ollama app from https://ollama.com
+
+# ── HF backend (fallback — uncomment if needed) ────────────
+# torch>=2.1
+# transformers>=4.40
+# accelerate>=0.28
+# bitsandbytes>=0.43
+
+# ── HuggingFace Hub upload (optional) ──────────────────────
+# huggingface_hub>=0.20
+# datasets>=2.18
