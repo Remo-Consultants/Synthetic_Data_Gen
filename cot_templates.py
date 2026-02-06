@@ -243,7 +243,7 @@ TEMPLATES: dict[str, dict] = {
     "alignment_trace": {
         "system": Template(
             "You are a professional translator between {{ language }} and English. "
-            "Show your translation decisions explicitly."
+            "Show your translation decisions explicitly, especially regarding cultural nuances."
         ),
         "user": Template(
             "Translate:\n\n\"{{ seed_text }}\"\n\n{{ query }}"
@@ -251,9 +251,101 @@ TEMPLATES: dict[str, dict] = {
         "cot_instruction": (
             "1. Parse source sentence structure\n"
             "2. Identify translation-hard spans (idioms, cultural terms)\n"
-            "3. Choose target equivalents with justification\n"
+            "3. Choose target equivalents with justification based on cultural context\n"
             "4. Reorder / restructure for target language grammar\n"
             "5. Produce final fluent translation"
+        ),
+    },
+
+    # ── Advanced Domains ──────────────────────────────────
+    
+    "scientific_method": {
+        "system": Template(
+            "You are a scientist explaining a phenomenon in {{ language }}. "
+            "Follow the scientific method: observation, hypothesis, experiment, analysis, and conclusion."
+        ),
+        "user": Template("{{ query }}\n\nContext:\n{{ seed_text }}"),
+        "cot_instruction": (
+            "1. Formulate a specific hypothesis based on the query\n"
+            "2. Identify variables (independent, dependent, control)\n"
+            "3. Describe the theoretical or experimental mechanism\n"
+            "4. Analyze potential results or data trends\n"
+            "5. Draw a scientifically grounded conclusion"
+        ),
+    },
+
+    "legal_analysis": {
+        "system": Template(
+            "You are a legal expert specializing in Indian Law. "
+            "Analyze the situation using the IRAC method (Issue, Rule, Analysis, Conclusion)."
+        ),
+        "user": Template("{{ query }}\n\nCase Details:\n{{ seed_text }}"),
+        "cot_instruction": (
+            "1. Identify the core legal Issue(s)\n"
+            "2. State the applicable Rule(s) (statutes, IPC sections, precedents)\n"
+            "3. Perform a detailed Analysis applying the rules to the facts\n"
+            "4. Reconcile with relevant Indian case law (if applicable)\n"
+            "5. State the legal Conclusion"
+        ),
+    },
+
+    "ethical_framework": {
+        "system": Template(
+            "You are a philosopher analyzing an ethical dilemma. "
+            "Provide a balanced view using multiple ethical frameworks (Utilitarianism, Deontology, Virtue Ethics)."
+        ),
+        "user": Template("Scenario:\n{{ seed_text }}\n\nTask: {{ query }}"),
+        "cot_instruction": (
+            "1. Define the ethical conflict and stakeholders\n"
+            "2. Evaluate through a Utilitarian lens (consequences, happiness)\n"
+            "3. Evaluate through a Deontological lens (duty, absolute rules)\n"
+            "4. Evaluate through a Virtue Ethics lens (character, wisdom)\n"
+            "5. Summarize the trade-offs and suggest a path forward"
+        ),
+    },
+
+    "code_reasoning": {
+        "system": Template(
+            "You are a senior software engineer. "
+            "Think algorithmically, explain logic step-by-step, and ensure code quality."
+        ),
+        "user": Template("Task: {{ query }}\n\n{% if seed_text %}Code/Context:\n{{ seed_text }}{% endif %}"),
+        "cot_instruction": (
+            "1. Deconstruct the problem into sub-tasks\n"
+            "2. Choose optimal data structures and algorithms\n"
+            "3. Outline the logic steps (pseudocode if helpful)\n"
+            "4. Discuss time/space complexity (Big O)\n"
+            "5. Provide the final, bug-free implementation"
+        ),
+    },
+
+    "analytical_reasoning": {
+        "system": Template(
+            "You are a strategic analyst. "
+            "Break down complex systems, identify levers of change, and predict outcomes."
+        ),
+        "user": Template("Analyze this: {{ query }}\n\nContext:\n{{ seed_text }}"),
+        "cot_instruction": (
+            "1. Define the scope and objective of analysis\n"
+            "2. Identify key components and their interdependencies\n"
+            "3. Apply analytical frameworks (SWOT, PESTEL, etc. if appropriate)\n"
+            "4. Evaluate quantitative and qualitative evidence\n"
+            "5. Formulate final insights and recommendations"
+        ),
+    },
+
+    "evidence_chain": {
+        "system": Template(
+            "You are a fact-checker and investigative analyst. "
+            "Trace the origins of claims and evaluate evidence reliability."
+        ),
+        "user": Template("Claim to verify: {{ query }}\n\nEvidence provided:\n{{ seed_text }}"),
+        "cot_instruction": (
+            "1. Break the claim into verifiable sub-claims\n"
+            "2. Cross-reference with the provided evidence / known facts\n"
+            "3. Assess source reliability and potential bias\n"
+            "4. Identify any logical fallacies or gaps in evidence\n"
+            "5. Give a final verdict (True, False, Misleading, Unverified)"
         ),
     },
 }

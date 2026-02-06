@@ -1,73 +1,166 @@
 # ============================================================
 # skills_config.yaml — Skill & Benchmark Registry
 # ============================================================
-# v3 — Ollama backend (primary), GGUF/HF fallbacks
+# v4 — Multi-Indian Language + Domain Expansion (4K Semantic)
+# Languages: Hindi, Tamil, Telugu, Kannada, Bengali, Punjabi
+# Domains: Math, Legal, Coding, Science, Law, Ethics, Politics, News
 # ============================================================
 
 skills:
 
-  # ── Foundation layer ──────────────────────────────────────
+  # ══════════════════════════════════════════════════════════
+  # FOUNDATION LAYER — Linguistic Fundamentals
+  # ══════════════════════════════════════════════════════════
+
+  # ── Hindi ──────────────────────────────────────────────────
   - id: FND-LEX-HI
     name: "Hindi Lexical & Syntactic"
     category: Foundation
     stages: [PRE]
     band: [B0, B2]
-    benchmarks: [HellaSwag-Hi]
+    benchmarks: [HellaSwag-Hi, IndicGLUE-Hi]
     seed_source: hindi_wikipedia
     languages: [hi, en]
     cot_style: linguistic_parse
+    target_tokens: 2048
 
+  # ── Tamil ──────────────────────────────────────────────────
+  - id: FND-LEX-TA
+    name: "Tamil Lexical & Syntactic"
+    category: Foundation
+    stages: [PRE]
+    band: [B0, B2]
+    benchmarks: [HellaSwag-Ta, IndicGLUE-Ta]
+    seed_source: tamil_wikipedia
+    languages: [ta, en]
+    cot_style: linguistic_parse
+    target_tokens: 2048
+
+  # ── Telugu ─────────────────────────────────────────────────
+  - id: FND-LEX-TE
+    name: "Telugu Lexical & Syntactic"
+    category: Foundation
+    stages: [PRE]
+    band: [B0, B2]
+    benchmarks: [HellaSwag-Te, IndicGLUE-Te]
+    seed_source: telugu_wikipedia
+    languages: [te, en]
+    cot_style: linguistic_parse
+    target_tokens: 2048
+
+  # ── Kannada ────────────────────────────────────────────────
+  - id: FND-LEX-KN
+    name: "Kannada Lexical & Syntactic"
+    category: Foundation
+    stages: [PRE]
+    band: [B0, B2]
+    benchmarks: [HellaSwag-Kn, IndicGLUE-Kn]
+    seed_source: kannada_wikipedia
+    languages: [kn, en]
+    cot_style: linguistic_parse
+    target_tokens: 2048
+
+  # ── Bengali ────────────────────────────────────────────────
+  - id: FND-LEX-BN
+    name: "Bengali Lexical & Syntactic"
+    category: Foundation
+    stages: [PRE]
+    band: [B0, B2]
+    benchmarks: [HellaSwag-Bn, IndicGLUE-Bn]
+    seed_source: bengali_wikipedia
+    languages: [bn, en]
+    cot_style: linguistic_parse
+    target_tokens: 2048
+
+  # ── Punjabi ────────────────────────────────────────────────
+  - id: FND-LEX-PA
+    name: "Punjabi Lexical & Syntactic"
+    category: Foundation
+    stages: [PRE]
+    band: [B0, B2]
+    benchmarks: [HellaSwag-Pa, IndicGLUE-Pa]
+    seed_source: punjabi_wikipedia
+    languages: [pa, en]
+    cot_style: linguistic_parse
+    target_tokens: 2048
+
+  # ── Cross-Lingual Semantic ─────────────────────────────────
   - id: FND-SEM
     name: "Semantic Understanding"
     category: Foundation
     stages: [PRE]
     band: [B1, B3]
-    benchmarks: [WinoGrande, COPA]
+    benchmarks: [WinoGrande, COPA, IndicNLU]
     seed_source: wikipedia_vital
-    languages: [en]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: semantic_chain
+    target_tokens: 2048
 
+  # ── Morphological Analysis ─────────────────────────────────
   - id: FND-MORPH
     name: "Morphological Analysis"
     category: Foundation
     stages: [PRE]
     band: [B0, B2]
-    benchmarks: [MorphoChallenge]
+    benchmarks: [MorphoChallenge, IndicMorph]
     seed_source: wiktionary
-    languages: [hi, en, de]
+    languages: [hi, ta, te, kn, bn, pa, en]
     cot_style: linguistic_parse
+    target_tokens: 2048
 
-  # ── Reasoning layer ───────────────────────────────────────
+
+  # ══════════════════════════════════════════════════════════
+  # REASONING LAYER — Core Cognitive Skills
+  # ══════════════════════════════════════════════════════════
+
+  # ── Mathematics ────────────────────────────────────────────
   - id: RSN-ARITH
     name: "Arithmetic & Numerical"
     category: Reasoning
     stages: [PRE, SFT]
     band: [B2, B4]
-    benchmarks: [GSM8K]
+    benchmarks: [GSM8K, MAWPS]
     seed_source: math_problems
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: step_by_step_math
+    target_tokens: 4096
 
+  - id: RSN-MATH-ADV
+    name: "Advanced Mathematics"
+    category: Reasoning
+    stages: [PRE, SFT]
+    band: [B3, B5]
+    benchmarks: [MATH, Minerva, MathQA]
+    seed_source: math_textbooks
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: step_by_step_math
+    target_tokens: 4096
+
+  # ── Logic & Deduction ──────────────────────────────────────
   - id: RSN-LOGIC
     name: "Logical Deduction"
     category: Reasoning
     stages: [SFT]
     band: [B2, B4]
-    benchmarks: [LogiQA, ReClor]
+    benchmarks: [LogiQA, ReClor, AR-LSAT]
     seed_source: logic_puzzles
-    languages: [en]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: deductive_chain
+    target_tokens: 4096
 
+  # ── Causal Reasoning ───────────────────────────────────────
   - id: RSN-CAUSAL
     name: "Causal Reasoning"
     category: Reasoning
     stages: [PRE, SFT]
     band: [B2, B5]
-    benchmarks: [COPA, e-CARE]
+    benchmarks: [COPA, e-CARE, CLADDER]
     seed_source: wikipedia_vital
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: causal_graph
+    target_tokens: 4096
 
+  # ── Analogical Reasoning ───────────────────────────────────
   - id: RSN-ANALOGICAL
     name: "Analogical Reasoning"
     category: Reasoning
@@ -75,122 +168,265 @@ skills:
     band: [B3, B5]
     benchmarks: [BATS, SAT-Analogy]
     seed_source: concept_pairs
-    languages: [en]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: mapping_chain
+    target_tokens: 4096
 
-  # ── Generation layer ──────────────────────────────────────
+  # ── Science Domains ────────────────────────────────────────
+  - id: RSN-PHYSICS
+    name: "Physics Reasoning"
+    category: Reasoning
+    stages: [PRE, SFT]
+    band: [B3, B5]
+    benchmarks: [SciQ, GPQA-Physics, JEE-Physics]
+    seed_source: physics_problems
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: scientific_method
+    target_tokens: 4096
+
+  - id: RSN-CHEMISTRY
+    name: "Chemistry Reasoning"
+    category: Reasoning
+    stages: [PRE, SFT]
+    band: [B3, B5]
+    benchmarks: [SciQ, GPQA-Chemistry, JEE-Chemistry]
+    seed_source: chemistry_problems
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: scientific_method
+    target_tokens: 4096
+
+  - id: RSN-BIOLOGY
+    name: "Biology Reasoning"
+    category: Reasoning
+    stages: [PRE, SFT]
+    band: [B3, B5]
+    benchmarks: [SciQ, GPQA-Biology, NEET-Biology]
+    seed_source: biology_problems
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: scientific_method
+    target_tokens: 4096
+
+  # ── Legal & Ethics ─────────────────────────────────────────
+  - id: RSN-LEGAL
+    name: "Legal Reasoning"
+    category: Reasoning
+    stages: [SFT]
+    band: [B3, B5]
+    benchmarks: [LegalBench, ILDC, Indian-LegalQA]
+    seed_source: legal_cases
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: legal_analysis
+    target_tokens: 4096
+
+  - id: RSN-ETHICS
+    name: "Ethical Reasoning"
+    category: Reasoning
+    stages: [SFT, DPO]
+    band: [B3, B5]
+    benchmarks: [ETHICS, MoralChoice, Jiminy]
+    seed_source: ethical_dilemmas
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: ethical_framework
+    target_tokens: 4096
+
+
+  # ══════════════════════════════════════════════════════════
+  # GENERATION LAYER — Content Creation
+  # ══════════════════════════════════════════════════════════
+
+  # ── Summarization ──────────────────────────────────────────
   - id: GEN-SUMM
     name: "Abstractive Summarization"
     category: Generation
     stages: [SFT]
     band: [B2, B4]
-    benchmarks: [XSum, CNN-DM]
+    benchmarks: [XSum, CNN-DM, IndicNLG]
     seed_source: news_articles
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: compression_trace
+    target_tokens: 3072
 
+  # ── Paraphrasing ───────────────────────────────────────────
   - id: GEN-PARA
     name: "Paraphrase Generation"
     category: Generation
     stages: [SFT]
     band: [B1, B3]
-    benchmarks: [PAWS, QQP]
+    benchmarks: [PAWS, QQP, IndicParaphrase]
     seed_source: wikipedia_vital
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: rewrite_trace
+    target_tokens: 2048
 
+  # ── Creative Writing ───────────────────────────────────────
   - id: GEN-CREATIVE
     name: "Creative Writing"
     category: Generation
     stages: [SFT, DPO]
     band: [B3, B5]
-    benchmarks: [WritingPrompts]
+    benchmarks: [WritingPrompts, StoryGen]
     seed_source: story_seeds
-    languages: [en]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: narrative_plan
+    target_tokens: 4096
 
-  # ── Applied layer ─────────────────────────────────────────
+
+  # ══════════════════════════════════════════════════════════
+  # APPLIED LAYER — Domain-Specific Tasks
+  # ══════════════════════════════════════════════════════════
+
+  # ── Information Retrieval ──────────────────────────────────
   - id: APP-RAG
     name: "RAG & Grounded QA"
     category: Applied
     stages: [SFT]
     band: [B2, B4]
-    benchmarks: [HotpotQA, NQ]
+    benchmarks: [HotpotQA, NQ, IndicQA]
     seed_source: wikipedia_vital
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: retrieval_reason
+    target_tokens: 4096
 
+  # ── Classification ─────────────────────────────────────────
   - id: APP-CLASS
     name: "Text Classification"
     category: Applied
     stages: [SFT]
     band: [B1, B3]
-    benchmarks: [MASSIVE, IndicNLU]
+    benchmarks: [MASSIVE, IndicNLU, IndicSentiment]
     seed_source: labeled_text
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: label_reason
+    target_tokens: 2048
 
+  # ── Named Entity Recognition ───────────────────────────────
   - id: APP-NER
     name: "Named Entity Recognition"
     category: Applied
     stages: [SFT]
     band: [B1, B3]
-    benchmarks: [WikiANN, NERLDC]
+    benchmarks: [WikiANN, NERLDC, IndicNER]
     seed_source: wikipedia_vital
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: span_trace
+    target_tokens: 2048
 
+  # ── Translation ────────────────────────────────────────────
   - id: APP-TRANSLATE
     name: "Translation & Code-Switch"
     category: Applied
     stages: [SFT]
     band: [B2, B4]
-    benchmarks: [FLORES, IN22]
+    benchmarks: [FLORES, IN22, IndicTrans]
     seed_source: parallel_corpus
-    languages: [en, hi]
+    languages: [en, hi, ta, te, kn, bn, pa]
     cot_style: alignment_trace
+    target_tokens: 3072
+
+  # ── Code Generation ────────────────────────────────────────
+  - id: APP-CODE
+    name: "Code Generation & Debugging"
+    category: Applied
+    stages: [SFT]
+    band: [B3, B5]
+    benchmarks: [HumanEval, MBPP, CodeContests, APPS]
+    seed_source: github_repos
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: code_reasoning
+    target_tokens: 4096
+
+  # ── Legal Applications ─────────────────────────────────────
+  - id: APP-LAW
+    name: "Legal Document Analysis"
+    category: Applied
+    stages: [SFT]
+    band: [B3, B5]
+    benchmarks: [ContractNLI, ILDC, LegalSumm]
+    seed_source: legal_documents
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: legal_analysis
+    target_tokens: 4096
+
+  # ── Political Analysis ─────────────────────────────────────
+  - id: APP-POLITICS
+    name: "Political Analysis"
+    category: Applied
+    stages: [SFT]
+    band: [B2, B4]
+    benchmarks: [PoliAff, LIAR, IndicPolitics]
+    seed_source: political_texts
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: analytical_reasoning
+    target_tokens: 4096
+
+  # ── News & Fact-Checking ───────────────────────────────────
+  - id: APP-NEWS
+    name: "News Analysis & Fact-Checking"
+    category: Applied
+    stages: [SFT]
+    band: [B2, B4]
+    benchmarks: [FEVER, MultiFC, IndicFact]
+    seed_source: news_articles
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: evidence_chain
+    target_tokens: 4096
+
+  # ── Scientific Literature ──────────────────────────────────
+  - id: APP-SCIENCE
+    name: "Scientific Literature Analysis"
+    category: Applied
+    stages: [SFT]
+    band: [B3, B5]
+    benchmarks: [SciQ, PubMedQA, SciFact]
+    seed_source: scientific_papers
+    languages: [en, hi, ta, te, kn, bn, pa]
+    cot_style: scientific_method
+    target_tokens: 4096
 
 
 # ================================================================
 # CONTEXT LENGTH DISTRIBUTION PROFILES
 # ================================================================
+# Optimized for 4K token semantic generation
+# Higher weights on 4096 tokens across all model sizes
 
 ctx_profiles:
 
   1b:
-    1024: 0.70
-    2048: 0.20
-    4096: 0.10
+    1024: 0.25
+    2048: 0.30
+    4096: 0.45
 
   3b:
-    1024: 0.50
-    2048: 0.30
-    4096: 0.20
+    1024: 0.15
+    2048: 0.25
+    4096: 0.50
+    8192: 0.10
 
   8b:
-    1024: 0.20
-    2048: 0.20
-    4096: 0.40
+    1024: 0.10
+    2048: 0.15
+    4096: 0.55
     8192: 0.20
 
   14b:
-    1024: 0.10
-    2048: 0.20
-    4096: 0.40
+    1024: 0.05
+    2048: 0.10
+    4096: 0.55
     8192: 0.30
 
   32b:
-    2048: 0.15
-    4096: 0.30
-    8192: 0.35
-    16384: 0.20
+    2048: 0.10
+    4096: 0.50
+    8192: 0.30
+    16384: 0.10
 
   70b:
-    2048: 0.10
-    4096: 0.25
+    2048: 0.05
+    4096: 0.45
     8192: 0.30
-    16384: 0.25
-    32768: 0.10
+    16384: 0.15
+    32768: 0.05
 
 
 # ================================================================
@@ -462,27 +698,136 @@ models:
 # ================================================================
 # GENERATION SETTINGS
 # ================================================================
+# Optimized for 4K token semantic/reasoning-heavy outputs
 
 generation:
   model_strategy: random
   gpu_tier: consumer_8gb
   backend_filter: ollama     # ollama | gguf | hf | all
 
-  temperature: 0.7
-  top_p: 0.9
-  top_k: 50
-  repetition_penalty: 1.1
+  # Sampling parameters optimized for long-form reasoning
+  temperature: 0.8           # Higher for diverse reasoning paths
+  top_p: 0.92
+  top_k: 60
+  repetition_penalty: 1.15   # Prevent loops in long outputs
 
   # Context distribution mode:
   #   profile  → sample from ctx_profiles per model size_class
   #   fixed    → always use fallback_max_new_tokens
   #   long_cot → always use model's max_cot
+  #   semantic_4k → prioritize 4096 tokens for semantic tasks
   ctx_mode: profile
 
-  fallback_max_new_tokens: 2048
+  # Target 4K tokens for semantic/reasoning tasks
+  fallback_max_new_tokens: 4096
+  min_reasoning_tokens: 3072  # Ensure deep reasoning
+  prefer_cot_models: true      # Prioritize models with COT
+
   batch_size: 1
   samples_per_seed: 3
   max_retries: 2
   checkpoint_every: 50
   output_format: parquet
   output_dir: ./output
+
+
+# ================================================================
+# COT STYLE DEFINITIONS
+# ================================================================
+# Chain-of-Thought reasoning styles used across skills
+
+cot_styles:
+  linguistic_parse: "Step-by-step linguistic analysis with morphological breakdown"
+  semantic_chain: "Semantic decomposition with meaning preservation"
+  step_by_step_math: "Mathematical reasoning with explicit steps and verification"
+  deductive_chain: "Logical deduction with premise-conclusion chains"
+  causal_graph: "Causal relationship mapping with counterfactual reasoning"
+  mapping_chain: "Analogical mapping with structural alignment"
+  scientific_method: "Hypothesis-evidence-conclusion scientific reasoning"
+  legal_analysis: "Legal reasoning with statute interpretation and precedent analysis"
+  ethical_framework: "Ethical reasoning with multiple moral frameworks"
+  compression_trace: "Summarization with information preservation trace"
+  rewrite_trace: "Paraphrasing with semantic equivalence verification"
+  narrative_plan: "Creative planning with plot structure and character development"
+  retrieval_reason: "Evidence retrieval with grounded reasoning"
+  label_reason: "Classification with explicit reasoning for label assignment"
+  span_trace: "Entity recognition with boundary detection reasoning"
+  alignment_trace: "Translation with cross-lingual alignment reasoning"
+  code_reasoning: "Code generation with algorithmic thinking and debugging"
+  analytical_reasoning: "Multi-perspective analysis with evidence synthesis"
+  evidence_chain: "Fact-checking with evidence evaluation and source verification"
+
+
+# ================================================================
+# LANGUAGE METADATA
+# ================================================================
+# ISO 639-1 codes and script information
+
+languages:
+  en:
+    name: "English"
+    script: "Latin"
+    family: "Indo-European"
+    
+  hi:
+    name: "Hindi"
+    script: "Devanagari"
+    family: "Indo-Aryan"
+    
+  ta:
+    name: "Tamil"
+    script: "Tamil"
+    family: "Dravidian"
+    
+  te:
+    name: "Telugu"
+    script: "Telugu"
+    family: "Dravidian"
+    
+  kn:
+    name: "Kannada"
+    script: "Kannada"
+    family: "Dravidian"
+    
+  bn:
+    name: "Bengali"
+    script: "Bengali"
+    family: "Indo-Aryan"
+    
+  pa:
+    name: "Punjabi"
+    script: "Gurmukhi"
+    family: "Indo-Aryan"
+
+
+# ================================================================
+# SEED SOURCE DEFINITIONS
+# ================================================================
+# Data sources for synthetic generation
+
+seed_sources:
+  hindi_wikipedia: "Hindi Wikipedia articles (high quality)"
+  tamil_wikipedia: "Tamil Wikipedia articles"
+  telugu_wikipedia: "Telugu Wikipedia articles"
+  kannada_wikipedia: "Kannada Wikipedia articles"
+  bengali_wikipedia: "Bengali Wikipedia articles"
+  punjabi_wikipedia: "Punjabi Wikipedia articles"
+  wikipedia_vital: "Wikipedia Vital Articles (multilingual)"
+  wiktionary: "Wiktionary entries (multilingual)"
+  math_problems: "Mathematical problem sets (GSM8K, MATH, etc.)"
+  math_textbooks: "Advanced mathematics textbooks"
+  physics_problems: "Physics problem sets (JEE, NEET, etc.)"
+  chemistry_problems: "Chemistry problem sets"
+  biology_problems: "Biology problem sets"
+  logic_puzzles: "Logic puzzles and deduction problems"
+  concept_pairs: "Conceptual analogy pairs"
+  news_articles: "News articles (multilingual)"
+  story_seeds: "Creative writing prompts"
+  labeled_text: "Pre-labeled classification datasets"
+  parallel_corpus: "Parallel translation corpora"
+  github_repos: "Open-source code repositories"
+  legal_cases: "Legal case documents (Indian law)"
+  legal_documents: "Legal contracts and documents"
+  political_texts: "Political speeches and analysis"
+  scientific_papers: "Scientific research papers"
+  ethical_dilemmas: "Ethical scenario datasets"

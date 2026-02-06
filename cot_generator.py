@@ -18,6 +18,19 @@ from cot_templates import build_prompt
 from model_manager import ModelManager
 
 
+# ── Language Mapping ────────────────────────────────────────
+
+LANGUAGE_MAP = {
+    "en": "English",
+    "hi": "Hindi",
+    "ta": "Tamil",
+    "te": "Telugu",
+    "kn": "Kannada",
+    "bn": "Bengali",
+    "pa": "Punjabi",
+}
+
+
 @dataclass
 class SynthRecord:
     """One record in the output dataset (mirrors PleIAs/SYNTH columns)."""
@@ -170,6 +183,11 @@ def generate_cot_batch(
         )
 
         cot_style = seed["cot_style"]
+        
+        # Expand language code to full name for prompt quality
+        lang_code = seed.get("language", "en")
+        seed["language"] = LANGUAGE_MAP.get(lang_code, lang_code)
+        
         sys_msg, usr_msg = build_prompt(cot_style, seed)
 
         messages = [

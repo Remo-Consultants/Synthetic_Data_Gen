@@ -16,17 +16,16 @@ pyyaml>=6.0
 jinja2>=3.1
 pandas>=2.0
 pyarrow>=14.0
+tqdm>=4.66
 
-# ── Ollama backend ──────────────────────────────────────────
-# No Python package needed! Ollama is called via HTTP.
-# Just install the Ollama app from https://ollama.com
+# ── Validation & Quality ────────────────────────────────────
+# No extra packages needed for Ollama-based validation.
+# If using HF backends for Judge models, uncomment below.
 
-# ── HF backend (fallback — uncomment if needed) ────────────
+# ── HF backend & Upload (optional) ──────────────────────────
+huggingface_hub>=0.20
+datasets>=2.18
 # torch>=2.1
 # transformers>=4.40
 # accelerate>=0.28
 # bitsandbytes>=0.43
-
-# ── HuggingFace Hub upload (optional) ──────────────────────
-# huggingface_hub>=0.20
-# datasets>=2.18

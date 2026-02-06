@@ -1,8 +1,8 @@
-# COT Synthetic Dataset Generator
+# COT Synthetic Dataset Generator (Multilingual & Multi-Domain)
 
-Local pipeline for generating Chain-of-Thought synthetic training data.
+Local pipeline for generating high-quality **4K token** Chain-of-Thought synthetic training data for **7 Indian languages** and **15+ specialized domains**.
 
-**v3** — Uses **Ollama** as primary backend. Zero Python build hassle. Same llama.cpp speed. Auto-pulls models.
+**v4** — Expanded support for **Hindi, Tamil, Telugu, Kannada, Bengali, Punjabi**, and **English**. Includes **Semantic Reasoning**, **Legal (IRAC)**, **Science (JEE/NEET level)**, and a new **Validation Framework**.
 
 ## Quick Start (5 minutes)
 
@@ -70,16 +70,16 @@ ollama pull gemma2:2b            # 1.6 GB
 # Random models, profile distribution (default)
 python run_pipeline.py --max-seeds 5
 
-# Fixed model, short outputs — fastest
-python run_pipeline.py --model-strategy fixed --model qwen3-4b --ctx-mode fixed --fixed-tokens 1024 --max-seeds 10
+# Fixed model, profile distribution + VALIDATION
+python run_pipeline.py --model-strategy fixed --model qwen3-8b --max-seeds 5 --validate --judge deepseek-r1-8b
 
-# Specific skills only
-python run_pipeline.py --skills RSN-ARITH RSN-LOGIC --max-seeds 5
+# Specific Multilingual Skills only (e.g., Tamil & Telugu)
+python run_pipeline.py --skills FND-LEX-TA FND-LEX-TE --max-seeds 5
 
-# Long COT traces for deep reasoning
-python run_pipeline.py --model-strategy fixed --model deepseek-r1-8b --ctx-mode long_cot --max-seeds 3
+# Deep Reasoning Domains (Physics, Legal)
+python run_pipeline.py --skills RSN-PHYSICS RSN-LEGAL --ctx-mode long_cot --max-seeds 3
 
-# With verification
+# With verification (per-trace scoring)
 python run_pipeline.py --verify --verifier qwen3-1.7b --max-seeds 5
 
 # HF fallback (if Ollama not available)
@@ -103,24 +103,49 @@ python run_pipeline.py --backend hf --model-strategy fixed --model deepseek-r1-q
 
 Larger tiers (16 GB+): `qwen3:14b`, `deepseek-r1:14b`, `qwen3:32b`, `deepseek-r1:32b`, `deepseek-r1:70b`
 
-## 14 Skills, 4 Layers
+## 26 Skills across 4 Layers
 
-| ID | Name | Category | COT Style |
+### 🏛️ Foundation Layer (Language & Syntax)
+| ID | Name | Languages | COT Style |
 |---|---|---|---|
-| FND-LEX-HI | Hindi Lexical & Syntactic | Foundation | linguistic_parse |
-| FND-SEM | Semantic Understanding | Foundation | semantic_chain |
-| FND-MORPH | Morphological Analysis | Foundation | linguistic_parse |
-| RSN-ARITH | Arithmetic & Numerical | Reasoning | step_by_step_math |
-| RSN-LOGIC | Logical Deduction | Reasoning | deductive_chain |
-| RSN-CAUSAL | Causal Reasoning | Reasoning | causal_graph |
-| RSN-ANALOGICAL | Analogical Reasoning | Reasoning | mapping_chain |
-| GEN-SUMM | Abstractive Summarization | Generation | compression_trace |
-| GEN-PARA | Paraphrase Generation | Generation | rewrite_trace |
-| GEN-CREATIVE | Creative Writing | Generation | narrative_plan |
-| APP-RAG | RAG & Grounded QA | Applied | retrieval_reason |
-| APP-CLASS | Text Classification | Applied | label_reason |
-| APP-NER | Named Entity Recognition | Applied | span_trace |
-| APP-TRANSLATE | Translation & Code-Switch | Applied | alignment_trace |
+| FND-LEX-HI | Hindi Lexical & Syntactic | hi, en | linguistic_parse |
+| FND-LEX-TA | Tamil Lexical & Syntactic | ta, en | linguistic_parse |
+| FND-LEX-TE | Telugu Lexical & Syntactic | te, en | linguistic_parse |
+| FND-LEX-KN | Kannada Lexical & Syntactic | kn, en | linguistic_parse |
+| FND-LEX-BN | Bengali Lexical & Syntactic | bn, en | linguistic_parse |
+| FND-LEX-PA | Punjabi Lexical & Syntactic | pa, en | linguistic_parse |
+| FND-SEM | Semantic Understanding | Multilingual | semantic_chain |
+| FND-MORPH | Morphological Analysis | Multilingual | linguistic_parse |
+
+### 🧠 Reasoning Layer (Logic & STEM)
+| ID | Name | Domains | COT Style |
+|---|---|---|---|
+| RSN-MATH-ADV | Advanced Mathematics | Math | step_by_step_math |
+| RSN-PHYSICS | Physics Reasoning | Science | scientific_method |
+| RSN-CHEMISTRY| Chemistry Reasoning | Science | scientific_method |
+| RSN-BIOLOGY  | Biology Reasoning | Science | scientific_method |
+| RSN-LEGAL    | Legal Reasoning | Law | legal_analysis |
+| RSN-ETHICS   | Ethical Reasoning | Ethics | ethical_framework |
+| RSN-LOGIC    | Logical Deduction | Logic | deductive_chain |
+| RSN-CAUSAL   | Causal Reasoning | Logic | causal_graph |
+
+### ✍️ Generation Layer
+| ID | Name | Categories | COT Style |
+|---|---|---|---|
+| GEN-SUMM | Abstractive Summarization | Gen | compression_trace |
+| GEN-PARA | Paraphrase Generation | Gen | rewrite_trace |
+| GEN-CREATIVE | Creative Writing | Gen | narrative_plan |
+
+### 🛠️ Applied Layer
+| ID | Name | Domains | COT Style |
+|---|---|---|---|
+| APP-CODE | Code Gen & Debugging | Code | code_reasoning |
+| APP-LAW  | Legal Doc Analysis | Law | legal_analysis |
+| APP-POLITICS | Political Analysis | Social | analytical_reasoning |
+| APP-NEWS | Fact-Checking | Social | evidence_chain |
+| APP-SCIENCE | Sci-Lit Analysis | STEM | analytical_reasoning |
+| APP-RAG | Grounded Retrieval | RAG | retrieval_reason |
+| APP-TRANSLATE| Translation | Multi | alignment_trace |
 
 ## Full CLI
 
@@ -139,6 +164,8 @@ python run_pipeline.py [OPTIONS]
   --verifier ID              Verifier model
   --max-seeds N              Max seeds per skill
   --samples-per-seed N       Variants per seed (default: 3)
+  --validate                 Run quality & diversity validation suite
+  --judge ID                 Model ID used as LLM-as-a-Judge (default: deepseek-r1-8b)
   --output-dir PATH          Output directory
   --output-format FORMAT     parquet | jsonl | both
   --resume                   Resume from checkpoint

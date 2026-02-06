@@ -37,6 +37,7 @@ from dataset_writer import (
     print_stats,
     push_to_hub,
 )
+from validation_framework import ValidationFramework
 
 
 # ================================================================
@@ -152,6 +153,8 @@ def main():
     parser.add_argument("--push-to-hub", default=None)
     parser.add_argument("--hf-token", default=None)
     parser.add_argument("--custom-seeds", default=None)
+    parser.add_argument("--validate", action="store_true", help="Run quality & diversity validation suite")
+    parser.add_argument("--judge", default="deepseek-r1-8b", help="Model ID used as LLM-as-a-Judge")
     parser.add_argument("--dry-run", action="store_true")
 
     args = parser.parse_args()
@@ -383,6 +386,42 @@ def main():
     if args.push_to_hub and parquet_path:
         token = args.hf_token or os.environ.get("HF_TOKEN")
         push_to_hub(parquet_path, args.push_to_hub, token=token)
+
+    # ── Quality & Diversity Validation ──────────────────────
+    if args.validate:
+        print("\n" + "=" * 70)
+        print("  DATASET VALIDATION")
+        print("=" * 70)
+        val_mgr = ModelManager()
+        judge_cfg = resolve_model(all_models, args.judge)
+        
+        # We need seeds attached to records for the validator
+        # generate_cot_batch currently returns dicts without the full seed dict
+        # Actually it has most fields. Let's wrap them.
+        validation_samples = []
+        for r in all_records:
+            validation_samples.append({
+                "seed": {
+                    "query": r["query"],
+                    "seed_text": r["query_seed_text"],
+                    "language": r["language"],
+                    "category": r["category"]
+                },
+                "completion": r["synthetic_reasoning"] + "\n" + r["synthetic_answer"],
+                "skill_id": r["skill_id"]
+            })
+            
+        validator = ValidationFramework(val_mgr)
+        val_results = validator.validate_dataset(validation_samples, judge_cfg)
+        
+        val_path = Path(output_dir) / "validation_report.json"
+        with open(val_path, "w", encoding="utf-8") as f:
+            json.dump(val_results, f, indent=2)
+            
+        print(f"\n[Validator] Diversity Score (Unique 3-grams): {val_results['diversity_score']:.2f}")
+        print(f"[Validator] Averages: {val_results['averages']}")
+        print(f"[Validator] Report saved to: {val_path}")
+        print("=" * 70)
 
 
 if __name__ == "__main__":
